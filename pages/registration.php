@@ -1,7 +1,7 @@
 <h1>Registration</h1>
 
 <form action="/registration" method="post">
-    <div class="form-group">
+    <div class="form-group mt-5">
         <label>Email:</label>
         <input type="email" name="email" class="form-control">
     </div>
@@ -16,5 +16,5 @@
         <input type="password" name="reppassword" class="form-control">
     </div>
 
-    <button class="btn btn-primary mt-3" name="action" value="checkRegistration">Sign Up</button>
+    <button class="btn btn-outline-success mt-5" name="action" value="checkRegistration">Sign Up</button>
 </form>

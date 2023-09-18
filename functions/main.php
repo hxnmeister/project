@@ -48,10 +48,42 @@
         {
             echo 'You have successfully registered!';
 
-            setcookie('email', $email, time() + 60);
-            setcookie('password', $passw, time() + 60);
+            //Куки как временное решение для хранение пароля, можно заменить на хранение в файле или в БД
+            setcookie($email, $passw, time() + 60);
             
             header('Location: /registration');
             exit;
+        }
+    }
+
+    function checkAuth()
+    {
+        $email = strip_tags(trim($_POST['email'])) ?? '';
+        $passw = strip_tags(trim($_POST['password'])) ?? '';
+
+        if(empty($email) || empty($passw))
+        {
+            echo 'Fill all fields!';
+        }
+        else
+        {
+            //Пароль который был получен из куки
+            $c_passw = $_COOKIE[$email] ?? '';
+
+            if(empty($c_passw))
+            {
+                echo 'There is no such user!';
+            }
+            elseif($c_passw !== $passw)
+            {
+                echo 'Check your input and try again!';
+            }
+            else
+            {
+                echo 'You have successfully logged in!';
+
+                header('Location: /auth');
+                exit;
+            }
         }
     }
