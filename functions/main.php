@@ -5,6 +5,11 @@
         $action();
     }
 
+    function isPageActive(string $currentPage)
+    {
+        return ((empty($_GET) && $currentPage === 'home') || array_search($currentPage, $_GET)) ? 'active' : '';
+    }
+
     function sendEmail()
     {
         $name = $_POST['name'] ?? '';
