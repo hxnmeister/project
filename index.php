@@ -24,6 +24,9 @@
                             <a class="nav-link <?php echo isPageActive('registration')?>" href="/registration">Sign Up</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link <?php echo isPageActive('auth')?>" href="/auth">Log In</a>
+                        </li>
+                        <li class="nav-item">
                         <a class="nav-link <?php echo isPageActive('home')?>"  href="/">Home</a>
                         </li>
                         <li class="nav-item">

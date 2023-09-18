@@ -12,9 +12,9 @@
 
     function sendEmail()
     {
-        $name = $_POST['name'] ?? '';
-        $email = $_POST['email'] ?? '';
-        $message = $_POST['message'] ?? '';
+        $name = strip_tags(trim($_POST['name'])) ?? '';
+        $email = strip_tags(trim($_POST['email'])) ?? '';
+        $message = strip_tags(trim($_POST['message'])) ?? '';
 
         if(empty($name) || empty($email) || empty($message))
         {
@@ -26,6 +26,29 @@
             echo 'Thank you!';
 
             header('Location: /contacts');
+            exit;
+        }
+    }
+
+    function checkRegistration()
+    {
+        $email = strip_tags(trim($_POST['email'])) ?? '';
+        $passw = strip_tags(trim($_POST['password'])) ?? '';
+        $reppassw = strip_tags(trim($_POST['reppassword'])) ?? '';
+
+        if(empty($email) || empty($passw) || empty($reppassw))
+        {
+            echo 'All fields must be filled';
+        }
+        elseif($passw !== $reppassw) 
+        {
+            echo 'The passwords do not match, try again!';
+        }
+        else
+        {
+            echo 'You have successfully registered!';
+
+            header('Location: /registration');
             exit;
         }
     }
