@@ -48,6 +48,9 @@
         {
             echo 'You have successfully registered!';
 
+            setcookie('email', $email, time() + 60);
+            setcookie('password', $passw, time() + 60);
+            
             header('Location: /registration');
             exit;
         }

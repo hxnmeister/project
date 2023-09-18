@@ -8,12 +8,12 @@
 
     <div class="form-group mt-3">
         <label>Password:</label>
-        <input type="text" name="password" class="form-control">
+        <input type="password" name="password" class="form-control">
     </div>
 
     <div class="form-group mt-3">
         <label>Repeat Password:</label>
-        <input type="text" name="reppassword" class="form-control">
+        <input type="password" name="reppassword" class="form-control">
     </div>
 
     <button class="btn btn-primary mt-3" name="action" value="checkRegistration">Sign Up</button>
