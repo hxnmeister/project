@@ -1,4 +1,14 @@
 <?php
+    require_once __DIR__."/helper.php";
+    require_once __DIR__."/Message.php";
+    require_once __DIR__."/OldInputs.php";
+
+    session_start();
+
+    // ini_set('upload_max_filesize', '500M');
+    // ini_set('error_reporting', E_ALL); // Включаємо вивід помилок з php
+    // echo phpinfo();
+
     $action = $_POST['action'] ?? null;
     if(!empty($action))
     {
@@ -18,16 +28,16 @@
 
         if(empty($name) || empty($email) || empty($message))
         {
-            echo 'Fill all fields!';
+            Message::set('All fields are required!', 'danger');
+            OldInputs::set($_POST);
         }
         else
         {
             mail($email, "Mail Site!", "$name, $email, $message");
-            echo 'Thank you!';
-
-            header('Location: /contacts');
-            exit;
+            Message::set('Thank you!');
         }
+
+        redirect('contacts');
     }
 
     function checkRegistration()
@@ -86,4 +96,38 @@
                 exit;
             }
         }
+    }
+
+    function uploadImage()
+    {
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg', 'image/avif'];
+
+        dump($_FILES['file']);
+
+        extract($_FILES['file']); //$name, $full_path, $type, $tmp_name, $error, $size
+
+        if($error === 4)
+        {
+            Message::set('File is required!', 'danger');
+            redirect("uploads");
+        }
+        elseif($error !== 0)
+        {
+            Message::set('File is not uploaded!', 'danger');
+            redirect('uploads');
+        }
+
+        if(in_array($type, $allowedTypes))
+        {
+            $fName = uniqid().'__'.session_id().'.'.end(explode('.', $name));
+            move_uploaded_file($tmp_name, './uploadedImages/'.$fName);
+        
+            Message::set('File is successfully uploaded!');
+        }
+        else
+        {
+            Message::set('Such type not allowed!', 'danger');
+        }
+
+        redirect('uploads');
     }

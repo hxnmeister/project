@@ -32,6 +32,9 @@
                         <li class="nav-item">
                         <a class="nav-link <?php echo isPageActive('contacts')?>" href="/contacts">Contacts</a>
                         </li>
+                        <li class="nav-item">
+                        <a class="nav-link <?php echo isPageActive('uploads')?>" href="/uploads">Uploads</a>
+                        </li>
                     </div>
                 </div>
             </nav>
@@ -43,6 +46,8 @@
                     if(file_exists("./pages/$page.php"))
                     {
                         require_once "./pages/$page.php";
+
+                        OldInputs::erase();
                     }
                     else
                     {
