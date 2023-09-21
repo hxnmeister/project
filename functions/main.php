@@ -131,3 +131,60 @@
 
         redirect('uploads');
     }
+
+    function uploadFewImages()
+    {
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg', 'image/avif'];
+        $dirName = strip_tags(trim($_POST['dir-name'])) ?? '';
+        
+        if(!empty($dirName))
+        {
+            extract($_FILES['files']);
+
+            if(!in_array(0, $error))
+            {
+                foreach($error as $errorCode)
+                {
+                    if($errorCode === 4)
+                    {
+                        Message::set('File is required!', 'danger');
+                    }
+                    else
+                    {
+                        Message::set('File not uploaded!', 'danger');
+                    }
+                }
+    
+                OldInputs::set($_POST);
+                redirect('custom-dir-upload');
+            }
+            
+            foreach($type as $typeName)
+            {
+                if(!in_array($typeName, $allowedTypes))
+                {
+                    OldInputs::set($_POST);
+                    Message::set("Type $typeName is not allowed!", 'danger');
+    
+                    redirect('custom-dir-upload');
+                }
+            }
+
+            if(!is_dir("./uploadedImages/$dirName"))
+            {
+                mkdir("./uploadedImages/$dirName");
+            }
+
+            for($i = 0; $i < sizeof($name); $i++)
+            {
+                $fileName = uniqid().'.'.end(explode('.', $name[$i]));
+                move_uploaded_file($tmp_name[$i], "./uploadedImages/$dirName/$fileName");
+            }
+        }
+        else
+        {
+            Message::set('Directory name is required!', 'danger');
+        }
+
+        redirect('custom-dir-upload');
+    }

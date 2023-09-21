@@ -27,13 +27,16 @@
                             <a class="nav-link <?php echo isPageActive('auth')?>" href="/auth">Log In</a>
                         </li>
                         <li class="nav-item">
-                        <a class="nav-link <?php echo isPageActive('home')?>"  href="/">Home</a>
+                            <a class="nav-link <?php echo isPageActive('home')?>"  href="/">Home</a>
                         </li>
                         <li class="nav-item">
-                        <a class="nav-link <?php echo isPageActive('contacts')?>" href="/contacts">Contacts</a>
+                            <a class="nav-link <?php echo isPageActive('contacts')?>" href="/contacts">Contacts</a>
                         </li>
                         <li class="nav-item">
-                        <a class="nav-link <?php echo isPageActive('uploads')?>" href="/uploads">Uploads</a>
+                            <a class="nav-link <?php echo isPageActive('uploads')?>" href="/uploads">Uploads</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo isPageActive('custom-dir-upload')?>" href="/custom-dir-upload">Custom Directory Upload</a>
                         </li>
                     </div>
                 </div>
