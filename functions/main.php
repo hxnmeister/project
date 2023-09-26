@@ -20,6 +20,24 @@
         return ((empty($_GET) && $currentPage === 'home') || array_search($currentPage, $_GET)) ? 'active' : '';
     }
 
+    function getSlidersDirs()
+    {
+        $directories = array_diff(scandir('./sliders'), ['.','..']);
+
+        if(!empty($directories))
+        {
+            echo "<option selected>Choose slider</option>";
+            foreach ($directories as $directory)
+            {
+                echo "<option value=\"$directory\">$directory</option>";
+            }
+        }
+        else
+        {
+            echo "<option selected>No available sliders!</option>";
+        }
+    }
+
     function sendEmail()
     {
         $name = strip_tags(trim($_POST['name'])) ?? '';
@@ -146,6 +164,8 @@
                 $fileName = uniqid().'.'.end(explode('.', $name[$i]));
                 move_uploaded_file($tmp_name[$i], "./uploadedImages/$dirName/$fileName");
             }
+
+            Message::set('File successfully loaded!');
         }
         else
         {
@@ -153,6 +173,40 @@
         }
 
         redirect('custom-dir-upload');
+    }
+
+    function createSlider() 
+    {
+        if(!is_dir('./sliders/'.$_POST['dir-name']))
+        {
+            mkdir('./sliders/'.$_POST['dir-name']);
+
+            Message::set('Slider successfully created!');
+        }
+        else
+        {
+            OldInputs::set($_POST);
+            Message::set('Such slider is already excisting!', 'danger');
+        }
+
+        redirect('manage-sliders');
+    }
+
+    function deleteSlider()
+    {
+        if(is_dir("./sliders/".$_POST['selected-slider']))
+        {
+            rmdir('./sliders/'.$_POST['selected-slider']);
+
+            Message::set('Slider successfully deleted!');
+        }
+        else
+        {
+            OldInputs::set($_POST);
+            Message::set('There is no such slider!', 'danger');
+        }
+
+        redirect('manage-sliders');
     }
 
     function uploadImage()
