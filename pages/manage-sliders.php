@@ -13,7 +13,7 @@
 
         <div class="form-group">
             <label>Load Image</label>
-            <select name="selected-slider" class="form-select">
+            <select name="selected-load-slider" class="form-select">
                 <?= getSlidersDirs()?>
             </select>
 
@@ -23,7 +23,7 @@
 
         <div class="form-group col-3">
             <label>Delete Slider</label>
-            <select name="selected-slider" class="form-select">
+            <select name="selected-delete-slider" class="form-select">
                 <?= getSlidersDirs()?>
             </select>
 

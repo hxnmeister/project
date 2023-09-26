@@ -116,14 +116,11 @@
         }
     }
 
-    function uploadFewImages()
+    function getImages(string $createDirName, array $allowed, array $images, string $dirToSave) : bool
     {
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg', 'image/avif'];
-        $dirName = strip_tags(trim($_POST['dir-name'])) ?? '';
-        
-        if(!empty($dirName))
+        if(!empty($createDirName))
         {
-            extract($_FILES['files']);
+            extract($images);
 
             if(!in_array(0, $error))
             {
@@ -140,36 +137,48 @@
                 }
     
                 OldInputs::set($_POST);
-                redirect('custom-dir-upload');
+                return false;
             }
             
             foreach($type as $typeName)
             {
-                if(!in_array($typeName, $allowedTypes))
+                if(!in_array($typeName, $allowed))
                 {
                     OldInputs::set($_POST);
                     Message::set("Type $typeName is not allowed!", 'danger');
     
-                    redirect('custom-dir-upload');
+                    return false;
                 }
             }
 
-            if(!is_dir("./uploadedImages/$dirName"))
+            if(!is_dir("$dirToSave/$createDirName"))
             {
-                mkdir("./uploadedImages/$dirName");
+                mkdir("$dirToSave/$createDirName");
             }
 
             for($i = 0; $i < sizeof($name); $i++)
             {
                 $fileName = uniqid().'.'.end(explode('.', $name[$i]));
-                move_uploaded_file($tmp_name[$i], "./uploadedImages/$dirName/$fileName");
+                move_uploaded_file($tmp_name[$i], "$dirToSave/$createDirName/$fileName");
             }
-
-            Message::set('File successfully loaded!');
         }
         else
         {
             Message::set('Directory name is required!', 'danger');
+            return false;
+        }
+
+        return true;
+    }
+
+    function uploadFewImages()
+    {
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg', 'image/avif'];
+        $dirName = strip_tags(trim($_POST['dir-name'])) ?? '';
+            
+        if(getImages($dirName, $allowedTypes, $_FILES['files'], './uploadedImages/'))
+        {
+            Message::set('File successfully loaded!');
         }
 
         redirect('custom-dir-upload');
@@ -177,11 +186,13 @@
 
     function createSlider() 
     {
-        if(!is_dir('./sliders/'.$_POST['dir-name']))
-        {
-            mkdir('./sliders/'.$_POST['dir-name']);
+        $directoryName = $_POST['dir-name'];
 
-            Message::set('Slider successfully created!');
+        if(!is_dir('./sliders/'.$directoryName))
+        {
+            mkdir('./sliders/'.$directoryName);
+
+            Message::set("Slider \"$directoryName\" successfully created!");
         }
         else
         {
@@ -194,11 +205,16 @@
 
     function deleteSlider()
     {
-        if(is_dir("./sliders/".$_POST['selected-slider']))
-        {
-            rmdir('./sliders/'.$_POST['selected-slider']);
+        $directoryPath = "./sliders/".$_POST['selected-delete-slider'];
 
-            Message::set('Slider successfully deleted!');
+        if(is_dir($directoryPath))
+        {
+            foreach(glob("$directoryPath/*.{jpg,jpeg,png,gif,webp,avif}", GLOB_BRACE) as $item)
+            {
+                unlink($item);
+            }
+
+            rmdir($directoryPath) ? Message::set('Slider successfully deleted!') : Message::set('Unable to delete slider!', 'danger');
         }
         else
         {
@@ -209,12 +225,23 @@
         redirect('manage-sliders');
     }
 
+    function loadImageToSlider()
+    {
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg', 'image/avif'];
+        $dirName = strip_tags(trim($_POST['selected-load-slider'])) ?? '';
+
+        if(getImages($dirName, $allowedTypes, $_FILES['files'], './sliders/'))
+        {
+            Message::set('Image successfully loaded to slider '.$dirName.'!');
+        }
+
+        redirect('manage-sliders');
+    }
+
     function uploadImage()
     {
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg', 'image/avif'];
-
-        dump($_FILES['file']);
-
+        
         extract($_FILES['file']); //$name, $full_path, $type, $tmp_name, $error, $size
 
         if($error === 4)
