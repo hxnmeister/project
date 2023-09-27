@@ -26,7 +26,7 @@
 
         if(!empty($directories))
         {
-            echo "<option selected>Choose slider</option>";
+            echo "<option value=\"\" selected>Choose slider</option>";
             foreach ($directories as $directory)
             {
                 echo "<option value=\"$directory\">$directory</option>";
@@ -34,7 +34,7 @@
         }
         else
         {
-            echo "<option selected>No available sliders!</option>";
+            echo "<option value=\"\" selected>No available sliders!</option>";
         }
     }
 
@@ -186,40 +186,70 @@
 
     function createSlider() 
     {
-        $directoryName = $_POST['dir-name'];
+        $directoryName = strip_tags(trim($_POST['dir-name'])) ?? '';
 
-        if(!is_dir('./sliders/'.$directoryName))
+        if(!empty($directoryName))
         {
-            mkdir('./sliders/'.$directoryName);
-
-            Message::set("Slider \"$directoryName\" successfully created!");
+            if(!is_dir('./sliders/'.$directoryName))
+            {
+                mkdir('./sliders/'.$directoryName);
+                mkdir('./sliders/'.$directoryName.'/small');
+    
+                Message::set("Slider \"$directoryName\" successfully created!");
+            }
+            else
+            {
+                OldInputs::set($_POST);
+                Message::set('Such slider is already excisting!', 'danger');
+            }
         }
         else
         {
-            OldInputs::set($_POST);
-            Message::set('Such slider is already excisting!', 'danger');
+            Message::set('Slider Name Cannot Be Empty!', 'danger');
         }
 
         redirect('manage-sliders');
     }
 
-    function deleteSlider()
+    function removeDir($path) 
     {
-        $directoryPath = "./sliders/".$_POST['selected-delete-slider'];
-
-        if(is_dir($directoryPath))
+        if (is_file($path)) 
         {
-            foreach(glob("$directoryPath/*.{jpg,jpeg,png,gif,webp,avif}", GLOB_BRACE) as $item)
+            unlink($path);
+        } 
+        else 
+        {
+            foreach(glob($path.'/*') as $item)
             {
-                unlink($item);
+                removeDir($item);
             }
 
-            rmdir($directoryPath) ? Message::set('Slider successfully deleted!') : Message::set('Unable to delete slider!', 'danger');
+            rmdir($path);
         }
-        else
+    }
+
+    function deleteSlider()
+    {
+        $selectedDir = $_POST['selected-delete-slider'] ?? '';
+        
+        if(!empty($selectedDir))
         {
-            OldInputs::set($_POST);
-            Message::set('There is no such slider!', 'danger');
+            $directoryPath = "./sliders/$selectedDir";
+
+            if(is_dir($directoryPath))
+            {
+                foreach(glob("$directoryPath/*") as $item)
+                {
+                    removeDir($item);
+                }
+    
+                rmdir($directoryPath) ? Message::set('Slider successfully deleted!') : Message::set('Unable to delete slider!', 'danger');
+            }
+            else
+            {
+                OldInputs::set($_POST);
+                Message::set('There is no such slider!', 'danger');
+            }
         }
 
         redirect('manage-sliders');
@@ -230,9 +260,42 @@
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg', 'image/avif'];
         $dirName = strip_tags(trim($_POST['selected-load-slider'])) ?? '';
 
-        if(getImages($dirName, $allowedTypes, $_FILES['files'], './sliders/'))
+        if(!empty($dirName))
         {
-            Message::set('Image successfully loaded to slider '.$dirName.'!');
+            if(getImages($dirName, $allowedTypes, $_FILES['files'], './sliders/'))
+            {
+                foreach(glob("./sliders/$dirName/*.{jpeg,png,gif,webp,jpg,avif}", GLOB_BRACE) as $image)
+                {
+                    $imageName = basename($image);
+                    $commonImagePath = "./sliders/$dirName/$imageName";
+                    $smallImagePath = "./sliders/$dirName/small/$imageName";
+    
+                    if(!file_exists($smallImagePath))
+                    {
+                        extract(pathinfo($commonImagePath));
+    
+                        $newWidth = 150;
+                        $newHeight = 150;
+                        $extension = strtolower($extension) === 'jpg' ? 'jpeg' : strtolower($extension);
+                        $functionCreate = 'imagecreatefrom'.$extension;
+                        $srcImage = $functionCreate($commonImagePath);
+                        $newImage = imagecreatetruecolor($newWidth, $newHeight);
+                        list($src_width, $src_height) = getimagesize($commonImagePath);
+    
+                        imagecopyresized($newImage, $srcImage, 0, 0, 0, 0, $newWidth, $newHeight, $src_width, $src_height);
+    
+                        if($extension === 'jpg')
+                        {
+                            ('image'.$extension)($newImage, "./sliders/$dirName/small/$imageName", 100);
+                        }
+                        else
+                        {
+                            ('image'.$extension)($newImage, "./sliders/$dirName/small/$imageName");
+                        }
+                    }
+                }
+                Message::set("Image successfully loaded to slider \"$dirName\"!");
+            }
         }
 
         redirect('manage-sliders');
@@ -273,14 +336,14 @@
         redirect('uploads');
     }
 
-    function resizeImage(string $path, int $size = 200, bool $crop = false) : void
+    function resizeImage(string $savePath, int $size = 200, bool $crop = false) : void
     {
-        extract(pathinfo($path));
+        extract(pathinfo($savePath));
 
         $extension = strtolower($extension) === 'jpg' ? 'jpeg' : strtolower($extension);
         $functionCreate = 'imagecreatefrom'.$extension;
-        $src = $functionCreate($path);
-        list($src_width, $src_height) = getimagesize($path);
+        $src = $functionCreate($savePath);
+        list($src_width, $src_height) = getimagesize($savePath);
 
         if($crop)
         {
