@@ -46,6 +46,9 @@
                         <li class="nav-item">
                             <a class="nav-link <?php echo isPageActive('gallery')?>" href="/gallery">Gallery</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo isPageActive('reviews')?>" href="/reviews">Reviews</a>
+                        </li>
                     </div>
                 </div>
             </nav>

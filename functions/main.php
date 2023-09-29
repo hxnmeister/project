@@ -383,4 +383,62 @@
         }
     }
 
-    
+    function sendReview()
+    {
+        $reviewFileName = 'reviews.txt';
+        $name = strip_tags(trim($_POST['name'])) ?? '';
+        $review = strip_tags(trim($_POST['review'])) ?? '';
+        $time = time();
+
+        if(empty($name) || empty($review))
+        {
+            Message::set('All fields are required!', 'danger');
+            redirect('reviews');
+        }
+
+        $reviews = file_exists($reviewFileName) ? json_decode(file_get_contents($reviewFileName)) : [];
+        $reviews[] = compact('name', 'review', 'time');
+
+        $file = fopen($reviewFileName, 'w'); //w - write, r - read, a - append, (w+,r+,a+ - позволяет выполнять обе функции)
+        fwrite($file, json_encode($reviews));
+        fclose($file);
+
+        redirect('reviews');
+    }
+
+    function showReviews()
+    {
+        $reviewFileName = 'reviews.txt';
+        $reviews = file_exists($reviewFileName) ? array_reverse(json_decode(file_get_contents($reviewFileName))) : [];
+        $reviewsCount = count($reviews);
+
+        if($reviewsCount === 0)
+        {
+            echo '<h1>No Reviews =<</h1>';
+        }
+        else
+        {
+            $limitPerPage = 3;
+            //$pagesAmount = ceil($reviewsCount / $limitPerPage);
+            $reviews = array_chunk($reviews, $limitPerPage);
+            $currentPage = $_GET['p'] ?? 1;
+
+            foreach($reviews[$currentPage - 1] as $review)
+            {
+                echo 
+                "<div class=\"mt-3 border p-3\">
+                    <strong>(".date('d.m.Y H:i', $review->time).") $review->name</strong>
+                    <div>$review->review</div>
+                </div>";
+            }
+
+            echo "<nav>";
+                echo "<ul class=\"pagination\">";
+                    for($i = 1; $i <= count($reviews); $i++)
+                    {
+                        echo "<li class=\"page-item ". ($currentPage == $i ? "active" : '') ."\"><a href=\"/reviews?p=$i\" class=\"page-link\">$i</a></li>";
+                    }
+                echo "</ul>";
+            echo "</nav>";
+        }
+    }
