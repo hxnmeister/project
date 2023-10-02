@@ -1,9 +1,11 @@
 <h1>Registration</h1>
 
+<?php Message::show()?>
+
 <form action="/registration" method="post">
     <div class="form-group mt-5">
         <label>Email:</label>
-        <input type="email" name="email" class="form-control">
+        <input type="email" name="email" class="form-control" value="<?= OldInputs::get('email') ?>">
     </div>
 
     <div class="form-group mt-3">

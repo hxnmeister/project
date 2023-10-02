@@ -1,7 +1,7 @@
 <?php
     require_once __DIR__."/helper.php";
-    require_once __DIR__."/Message.php";
-    require_once __DIR__."/OldInputs.php";
+    require_once "./classes/Message.php";
+    require_once "./classes/OldInputs.php";
 
     session_start();
 
@@ -66,22 +66,40 @@
 
         if(empty($email) || empty($passw) || empty($reppassw))
         {
-            echo 'All fields must be filled';
+            Message::set('All fields must be filled', 'danger');
+            OldInputs::set($_POST);
         }
         elseif($passw !== $reppassw) 
         {
-            echo 'The passwords do not match, try again!';
+            Message::set('The passwords do not match, try again!', 'danger');
+            OldInputs::set($_POST);
         }
         else
         {
-            echo 'You have successfully registered!';
-
-            //Куки как временное решение для хранение пароля, можно заменить на хранение в файле или в БД
-            setcookie($email, $passw, time() + 60);
+            $fileName = 'authData.txt';
+            $fileData = file_exists($fileName) ? json_decode(file_get_contents($fileName)) : [];
             
-            header('Location: /registration');
-            exit;
+            foreach($fileData as $item)
+            {
+                if($email === $item->email)
+                {
+                    Message::set("Such user \"$email\" already registered!", 'danger');
+                    OldInputs::set($_POST);
+
+                    redirect('registration');
+                }
+            }
+
+            $fileData[] = compact('email', 'passw');
+            $file = fopen($fileName, 'w');
+                
+            fwrite($file, json_encode($fileData));
+            fclose($file);
+
+            Message::set('You have successfully registered!');
         }
+
+        redirect('registration');
     }
 
     function checkAuth()
@@ -91,29 +109,29 @@
 
         if(empty($email) || empty($passw))
         {
-            echo 'Fill all fields!';
+            Message::set('All fields must be filled', 'danger');
+            OldInputs::set($_POST);
         }
         else
         {
-            //Пароль который был получен из куки
-            $c_passw = $_COOKIE[$email] ?? '';
+            $fileName = 'authData.txt';
+            $fileData = file_exists($fileName) ? json_decode(file_get_contents($fileName)) : [];
 
-            if(empty($c_passw))
+            foreach ($fileData as $item) 
             {
-                echo 'There is no such user!';
-            }
-            elseif($c_passw !== $passw)
-            {
-                echo 'Check your input and try again!';
-            }
-            else
-            {
-                echo 'You have successfully logged in!';
+                if($email === $item->email && $passw === $item->passw)
+                {
+                    $_SESSION['user'] = $email;
 
-                header('Location: /auth');
-                exit;
+                    Message::set('You have successfully logged in!');
+                    redirect('home');
+                }
             }
+
+            Message::set("Such user \"$email\" not found!", 'danger');
         }
+
+        redirect('auth');
     }
 
     function getImages(string $createDirName, array $allowed, array $images, string $dirToSave) : bool

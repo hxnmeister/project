@@ -21,34 +21,41 @@
                     <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo isPageActive('registration')?>" href="/registration">Sign Up</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo isPageActive('auth')?>" href="/auth">Log In</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo isPageActive('home')?>"  href="/">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo isPageActive('contacts')?>" href="/contacts">Contacts</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo isPageActive('uploads')?>" href="/uploads">Uploads</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo isPageActive('custom-dir-upload')?>" href="/custom-dir-upload">Custom Directory Upload</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo isPageActive('manage-sliders')?>" href="/manage-sliders">Manage Sliders</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo isPageActive('gallery')?>" href="/gallery">Gallery</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo isPageActive('reviews')?>" href="/reviews">Reviews</a>
-                        </li>
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo isPageActive('registration')?>" href="/registration">Sign Up</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo isPageActive('auth')?>" href="/auth">Log In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo isPageActive('home')?>"  href="/">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo isPageActive('contacts')?>" href="/contacts">Contacts</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo isPageActive('uploads')?>" href="/uploads">Uploads</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo isPageActive('custom-dir-upload')?>" href="/custom-dir-upload">Custom Directory Upload</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo isPageActive('manage-sliders')?>" href="/manage-sliders">Manage Sliders</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo isPageActive('gallery')?>" href="/gallery">Gallery</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo isPageActive('reviews')?>" href="/reviews">Reviews</a>
+                            </li>
+                            
+                            <?php if(isset($_SESSION['user'])):?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="./functions/logout.php">Logout</a>
+                                </li>
+                            <?php endif;?>
+                        </ul>
                     </div>
                 </div>
             </nav>
